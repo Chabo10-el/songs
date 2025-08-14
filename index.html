@@ -6,74 +6,70 @@
 <title>Paroles avec images</title>
 <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap" rel="stylesheet">
 <style>
-  body {
+  html, body {
     margin:0;
     padding:0;
+    width:100%;
+    height:100%;
     font-family: 'Gloria Hallelujah', cursive;
+    overflow:hidden;
+    color:#fff;
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
-    overflow:hidden;
-    color:#fff;
-    position:relative;
   }
 
-  /* Image de fond */
-  .bg-image {
+  /* Fond */
+  #bg {
     position:fixed;
     top:0;
     left:0;
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:cover; /* couvre tout l'écran sans déformation */
     z-index:-1;
-    opacity:0.25;
-    transition: opacity 0.5s;
   }
 
   #lyrics-container {
-    position: relative;
-    width: 90%;
-    max-width: 700px;
-    text-align: center;
-    padding: 10px;
+    position:relative;
+    width:90%;
+    max-width:700px;
+    text-align:center;
     z-index:1;
   }
 
   .lyrics {
-    font-size: 2em;
-    margin: 10px 0;
-    opacity: 0;
-    transform: translateY(20px);
+    font-size:2em;
+    margin:10px 0;
+    opacity:0;
+    transform:translateY(20px);
     transition: all 0.7s ease;
-    line-height: 1.5em;
+    line-height:1.5em;
   }
 
   .lyrics.visible {
-    opacity: 1;
-    transform: translateY(0);
+    opacity:1;
+    transform:translateY(0);
   }
 
   button {
-    margin-top: 20px;
-    padding: 14px 30px;
-    font-size: 1.2em;
-    background: #ff6f91;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.3s ease;
+    margin-top:20px;
+    padding:14px 30px;
+    font-size:1.2em;
+    background:#ff6f91;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     z-index:1;
     position:relative;
+    transition: transform 0.2s, background 0.3s;
   }
 
   button:hover { transform: scale(1.08); background:#ff467e; }
   button:active { transform: scale(0.95); }
 
-  /* Responsive */
   @media (max-width:768px) {
     .lyrics { font-size:1.5em; }
     button { font-size:1em; padding:12px 25px; }
@@ -83,27 +79,23 @@
     button { font-size:0.9em; padding:10px 20px; }
   }
 
-  /* Emoji animations */
   .emoji {
-    display: inline-block;
-    animation: bounce 1s infinite alternate;
-    font-size: 1em;
+    display:inline-block;
+    animation:bounce 1s infinite alternate;
   }
   @keyframes bounce {
     0% { transform: translateY(0); }
     100% { transform: translateY(-5px); }
   }
-
 </style>
 </head>
 <body>
 
-<!-- Fond avec image par défaut visible dès l'ouverture -->
-<img id="bg" class="bg-image" src="default_background.jpg" alt="Background image">
+<!-- Fond par défaut visible dès le début -->
+<img id="bg" src="3.jpg" alt="Background">
 
 <div id="lyrics-container"></div>
-
-<button onclick="playSong()">Jouer la chanson ▶️</button>
+<button id="playBtn">Jouer la chanson ▶️</button>
 
 <audio id="song" src="triste_audio.mp3"></audio>
 
@@ -121,29 +113,30 @@ const lyrics = [
 
 const container = document.getElementById('lyrics-container');
 const bg = document.getElementById('bg');
+const song = document.getElementById('song');
+const playBtn = document.getElementById('playBtn');
 
-// Ajouter les paroles dans le DOM
-lyrics.forEach(line=>{
+// Ajouter les paroles
+lyrics.forEach(line => {
   const div = document.createElement('div');
-  div.className='lyrics';
+  div.className = 'lyrics';
   div.innerHTML = line.text.replace(/([\u231A-\u27BF\u1F000-\u1F9FF])/g, '<span class="emoji">$1</span>');
   container.appendChild(div);
 });
 
-function playSong() {
-  const song = document.getElementById('song');
+// Fonction lecture audio + affichage paroles
+playBtn.addEventListener('click', () => {
   song.play();
-
   lyrics.forEach((line,index)=>{
     setTimeout(()=>{
       const divs = document.querySelectorAll('.lyrics');
       divs[index].classList.add('visible');
-      if(line.img){
-        bg.src = line.img; // change le fond à chaque ligne
-      }
+      if(line.img) bg.src = line.img;
     }, line.time);
   });
-}
+  // cacher le bouton
+  playBtn.style.display='none';
+});
 </script>
 
 </body>
